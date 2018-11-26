@@ -5,7 +5,7 @@ spark structured streaming example
 1. get from json-file (StreamingFile.java)
 2. get from Kafka (StreamingFile.java)
 
-Data format like that:
+Source data format like that:
 
 {"ip": "172.10.2.125", "unix_time": 1543170426, "type": "view", "category_id": 1005},
 
