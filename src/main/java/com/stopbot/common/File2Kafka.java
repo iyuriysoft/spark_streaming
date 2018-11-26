@@ -13,21 +13,17 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 
-//
-//
-//
-//
-
 /**
  * 
- * Reads lines from csv-file and sends to Kafka like streaming
+ * Reads lines from test-file and sends to Kafka like streaming
  *
  * file sample:
- * 1540913270,1005,172.10.1.52,click,
- * 1540913270,1000,172.10.3.54,view,
- * 1540913270,1009,172.10.2.96,click,
- * 1540913270,1003,172.10.1.126,view,
- * 
+ * {"ip": "172.10.0.172", "unix_time": 1543170426, "type": "view", "category_id": 1008},
+ * {"ip": "172.10.3.23", "unix_time": 1543170426, "type": "view", "category_id": 1002},
+ * {"ip": "172.10.3.135", "unix_time": 1543170426, "type": "click", "category_id": 1007},
+ * {"ip": "172.10.3.138", "unix_time": 1543170426, "type": "view", "category_id": 1001},
+ * {"ip": "172.10.0.190", "unix_time": 1543170426, "type": "view", "category_id": 1001},
+ * ...
  */
 public class File2Kafka {
 
