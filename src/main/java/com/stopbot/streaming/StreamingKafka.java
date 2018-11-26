@@ -28,7 +28,7 @@ import com.stopbot.common.UDFUniqCount;
 
 public final class StreamingKafka {
 
-    private static int WAITING_REQUESTS_IN_SEC = 60;
+    private static int WAITING_IN_SEC = 60;
     private static int THRESHOLD_COUNT_IP = 59;
     private static int THRESHOLD_COUNT_UNIQ_CATEGORY = 15;
     private static double THRESHOLD_CLICK_VIEW_RATIO = 3.5;
@@ -118,7 +118,7 @@ public final class StreamingKafka {
                 .format("console")
                 .option("truncate", false)
                 .option("numRows", 10)
-                .trigger(Trigger.ProcessingTime(WAITING_REQUESTS_IN_SEC, TimeUnit.SECONDS))
+                .trigger(Trigger.ProcessingTime(WAITING_IN_SEC, TimeUnit.SECONDS))
                 .foreach(new TargetWriter())
                 .start();
 

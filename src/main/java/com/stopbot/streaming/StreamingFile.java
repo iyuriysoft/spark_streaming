@@ -23,9 +23,9 @@ import com.stopbot.common.UDFUniqCount;
 public final class StreamingFile {
 
     private static String INPUT_DIR = "/Users/Shared/test/fraud";
-    private static int WAITING_REQUESTS_IN_SEC = 60;
+    private static int WAITING_IN_SEC = 60;
     private static int THRESHOLD_COUNT_IP = 59;
-    private static int THRESHOLD_COUNT_CATEGORY = 15;
+    private static int THRESHOLD_COUNT_UNIQ_CATEGORY = 15;
     private static double THRESHOLD_CLICK_VIEW_RATIO = 3.5;
 
     private static void setupUDFs(SparkSession spark) {
@@ -76,7 +76,7 @@ public final class StreamingFile {
 
         Dataset<Row> wdf = AnalyseFraud.getFilterData(stream,
                 THRESHOLD_COUNT_IP,
-                THRESHOLD_COUNT_CATEGORY,
+                THRESHOLD_COUNT_UNIQ_CATEGORY,
                 THRESHOLD_CLICK_VIEW_RATIO);
         wdf.printSchema();
 
@@ -93,7 +93,7 @@ public final class StreamingFile {
                 .format("console")
                 .option("truncate", false)
                 .option("numRows", 10)
-                .trigger(Trigger.ProcessingTime(WAITING_REQUESTS_IN_SEC, TimeUnit.SECONDS))
+                .trigger(Trigger.ProcessingTime(WAITING_IN_SEC, TimeUnit.SECONDS))
                 .foreach(new TargetWriter())
                 .start();
 
