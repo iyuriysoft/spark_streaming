@@ -1,7 +1,13 @@
 package com.stopbot.streaming;
 
+import static org.apache.spark.sql.functions.col;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
@@ -20,12 +26,11 @@ import com.stopbot.common.TargetWriter;
 import com.stopbot.common.UDFRatio;
 import com.stopbot.common.UDFUniqCount;
 
-public final class StreamingFile {
+public final class StreamingKafka {
 
-    private static String INPUT_DIR = "/Users/Shared/test/fraud";
     private static int WAITING_REQUESTS_IN_SEC = 60;
     private static int THRESHOLD_COUNT_IP = 59;
-    private static int THRESHOLD_COUNT_CATEGORY = 15;
+    private static int THRESHOLD_COUNT_UNIQ_CATEGORY = 15;
     private static double THRESHOLD_CLICK_VIEW_RATIO = 3.5;
 
     private static void setupUDFs(SparkSession spark) {
@@ -58,28 +63,48 @@ public final class StreamingFile {
                 .add("type", "string")
                 .add("category_id", "int");
 
-        StreamingFile job = new StreamingFile();
-        job.startJobFile(spark, schema);
+        StreamingKafka job = new StreamingKafka();
+        job.startJobKafka(spark, schema);
     }
 
-    private void startJobFile(SparkSession spark, StructType schema) throws StreamingQueryException {
 
-        // Create a Dataset representing the stream of input files
+    private void startJobKafka(SparkSession spark, StructType schema) throws StreamingQueryException {
+
+        String brokers = "localhost:9092";
+        String groupId = "0";// UUID.randomUUID().toString();
+        String topics = "firsttopic";
+
+        Map<String, Object> kafkaParams = new HashMap<>();
+        kafkaParams.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, brokers);
+        kafkaParams.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
+        kafkaParams.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        kafkaParams.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+
         Dataset<Row> stream = spark
                 .readStream()
-                .schema(schema)
-                .json(INPUT_DIR)
+                .format("kafka")
+                .option("kafka.bootstrap.servers", brokers)
+                .option("subscribe", topics)
+                .load()
+                .selectExpr("cast(value as string)")
+                .withColumn("tokens", functions.from_json(col("value"), schema))
+                .withColumn("unix_time", functions.col("tokens").getItem("unix_time").cast("long"))
                 .withColumn("tstamp",
                         functions.to_timestamp(
-                                functions.from_unixtime(functions.col("unix_time"))));
+                                functions.from_unixtime(functions.col("unix_time")))) // Event time has to be a
+                                                                                      // timestamp
+                .withColumn("category_id", functions.col("tokens").getItem("category_id").cast("long"))
+                .withColumn("ip", functions.col("tokens").getItem("ip"))
+                .withColumn("type", functions.col("tokens").getItem("type"))
+                ;
         stream.printSchema();
 
         Dataset<Row> wdf = AnalyseFraud.getFilterData(stream,
                 THRESHOLD_COUNT_IP,
-                THRESHOLD_COUNT_CATEGORY,
+                THRESHOLD_COUNT_UNIQ_CATEGORY,
                 THRESHOLD_CLICK_VIEW_RATIO);
         wdf.printSchema();
-
+        
         // Row -> String
         Dataset<String> wdf2 = wdf.map(row -> String.format("%s, %s, %d, %d, %f",
                 row.getAs("unix_time"), row.getAs("ip"), row.getAs("cnt"),

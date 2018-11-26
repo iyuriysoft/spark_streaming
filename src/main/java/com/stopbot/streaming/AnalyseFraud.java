@@ -18,6 +18,7 @@ public class AnalyseFraud {
     //|-- tstamp: timestamp (nullable = true)
 
     /**
+     * Apply some filter for source data
      * 
      * @param df                  Dataset<Row> 
      * @param threshold
