@@ -1,7 +1,7 @@
 # spark_streaming
 spark structured streaming example
 
-##There two options to get source data:
+### There two options to get source data:
 1. get from json-file (StreamingFile.java)
 2. get from Kafka (StreamingFile.java)
 
