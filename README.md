@@ -18,7 +18,7 @@ Signs of bot activity in out case:
 2. High difference between click and view events, e.g. (clicks/views) more than 3.5. Correctly process cases when there is no views.
 3. Looking for many categories during the period, e.g. more than 15 categories in 5 minutes.
 
-How to start to send data to Kafka (to use in StreamingKafka.java):
+Starts real-time emulation (transfer data from json-file to Kafka (to use in StreamingKafka.java):
 ```
 > java -jar stopbot-0.0.1-SNAPSHOT-jar-with-dependencies.jar 0 100 1_bot.json localhost:9092 firsttopic
 ```
