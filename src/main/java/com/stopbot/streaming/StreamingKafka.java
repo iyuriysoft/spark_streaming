@@ -93,7 +93,7 @@ public final class StreamingKafka {
                         functions.to_timestamp(
                                 functions.from_unixtime(functions.col("unix_time")))) // Event time has to be a
                                                                                       // timestamp
-                .withColumn("category_id", functions.col("tokens").getItem("category_id").cast("long"))
+                .withColumn("category_id", functions.col("tokens").getItem("category_id").cast("int"))
                 .withColumn("ip", functions.col("tokens").getItem("ip"))
                 .withColumn("type", functions.col("tokens").getItem("type"))
                 ;
