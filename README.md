@@ -14,9 +14,9 @@ Source data format like that:
 ...
 
 Signs of bot activity in out case:
-1. Enormous event rate, e.g. more than 59 request in 5 minutes.
+1. Enormous event rate, e.g. more than 59 request in 2 minutes.
 2. High difference between click and view events, e.g. (clicks/views) more than 3.5. Correctly process cases when there is no views.
-3. Looking for many categories during the period, e.g. more than 15 categories in 5 minutes.
+3. Looking for many categories during the period, e.g. more than 15 categories in 2 minutes.
 
 Starts real-time emulation (transfer data from json-file to Kafka (to use in StreamingKafka.java):
 ```

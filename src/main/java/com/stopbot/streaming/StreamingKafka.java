@@ -29,6 +29,9 @@ import com.stopbot.common.UDFUniqCount;
 public final class StreamingKafka {
 
     private static int WAITING_IN_SEC = 60;
+    private static int WIN_WATERMARK_IN_MIN = 5;
+    private static int WIN_DURATION_IN_MIN = 2;
+    private static int WIN_SLIDE_DURATION_IN_MIN = 1;
     private static int THRESHOLD_COUNT_IP = 59;
     private static int THRESHOLD_COUNT_UNIQ_CATEGORY = 15;
     private static double THRESHOLD_CLICK_VIEW_RATIO = 3.5;
@@ -102,7 +105,11 @@ public final class StreamingKafka {
         Dataset<Row> wdf = AnalyseFraud.getFilterData(stream,
                 THRESHOLD_COUNT_IP,
                 THRESHOLD_COUNT_UNIQ_CATEGORY,
-                THRESHOLD_CLICK_VIEW_RATIO);
+                THRESHOLD_CLICK_VIEW_RATIO,
+                WIN_WATERMARK_IN_MIN,
+                WIN_DURATION_IN_MIN,
+                WIN_SLIDE_DURATION_IN_MIN
+                );
         wdf.printSchema();
         
         // Row -> String

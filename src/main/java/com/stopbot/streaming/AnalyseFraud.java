@@ -11,29 +11,35 @@ public class AnalyseFraud {
 
     // input schema
     //
-    //|-- ip: string (nullable = true)
-    //|-- unix_time: long (nullable = true)
-    //|-- type: string (nullable = true)
-    //|-- category_id: integer (nullable = true)
-    //|-- tstamp: timestamp (nullable = true)
+    // |-- ip: string (nullable = true)
+    // |-- unix_time: long (nullable = true)
+    // |-- type: string (nullable = true)
+    // |-- category_id: integer (nullable = true)
+    // |-- tstamp: timestamp (nullable = true)
 
     /**
-     * Apply some filter for source data
+     * Apply some filter to the source data
      * 
-     * @param df                  Dataset<Row> 
+     * @param df                  Dataset<Row> (see input schema)
      * @param threshold
      * @param thresholdCategories
      * @param thresholdRatio
+     * @param delayThreshold      watermark in munutes
+     * @param windowDuration      window duration in munutes
+     * @param slideDuration       slide duration in minutes
      * @return Dataset<Row> ip, unix_time
      */
     public static Dataset<Row> getFilterData(Dataset<Row> df,
-            int threshold, int thresholdCategories, double thresholdRatio) {
+            int threshold, int thresholdCategories, double thresholdRatio,
+            int delayThreshold, int windowDuration, int slideDuration) {
 
         // Apply event-time window
         Dataset<Row> wdf = df
-                .withWatermark("tstamp", "5 minutes")
+                .withWatermark("tstamp", String.format("%d minutes", delayThreshold))
                 .groupBy(
-                        functions.window(functions.col("tstamp"), "2 minutes", "1 minutes"),
+                        functions.window(functions.col("tstamp"),
+                                String.format("%d minutes", windowDuration),
+                                String.format("%d minutes", slideDuration)),
                         functions.col("ip"))
                 .agg(functions.count("*").alias("cnt"),
                         functions.collect_list("type").alias("types"),

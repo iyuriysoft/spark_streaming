@@ -6,7 +6,7 @@ import scala.collection.mutable.WrappedArray;
 
 /**
  * 
- * Calculate ratio count of values #1 / count of values #2
+ * Calculate ratio of count of values#1 divided by count of values#2
  *
  */
 public class UDFRatio implements UDF1<WrappedArray<String>, Double> {
