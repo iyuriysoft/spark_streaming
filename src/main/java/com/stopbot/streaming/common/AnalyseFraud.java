@@ -17,9 +17,9 @@ public class AnalyseFraud {
      * @param threshold
      * @param thresholdCategories
      * @param thresholdRatio
-     * @param delayThreshold      watermark in munutes
-     * @param windowDuration      window duration in munutes
-     * @param slideDuration       slide duration in minutes
+     * @param delayThreshold      watermark in sec
+     * @param windowDuration      window duration in sec
+     * @param slideDuration       slide duration in sec
      * @return Dataset<Row> ip, unix_time
      */
     public static Dataset<Row> getFilterData(Dataset<Row> df,
