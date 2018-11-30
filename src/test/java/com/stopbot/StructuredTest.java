@@ -19,7 +19,7 @@ import com.stopbot.common.UsefulFuncs;
 import com.stopbot.rdd.common.Click;
 import com.stopbot.streaming.common.AnalyseFraud;
 
-public class StreamingTest {
+public class StructuredTest {
 
     private static SparkSession spark;
 
