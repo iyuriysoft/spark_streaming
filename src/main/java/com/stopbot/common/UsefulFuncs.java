@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.types.DataTypes;
 
-import com.stopbot.rdd.common.Click;
+import com.stopbot.dstream.common.Click;
 
 public class UsefulFuncs {
 

@@ -1,4 +1,4 @@
-package com.stopbot.rdd;
+package com.stopbot.dstream;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,8 +26,8 @@ import org.apache.spark.streaming.kafka010.LocationStrategies;
 import com.stopbot.common.UDFRatio;
 import com.stopbot.common.UDFUniqCount;
 import com.stopbot.common.UsefulFuncs;
-import com.stopbot.rdd.common.Click;
-import com.stopbot.rdd.common.JavaSingletonSpark;
+import com.stopbot.dstream.common.Click;
+import com.stopbot.dstream.common.JavaSingletonSpark;
 
 import scala.Tuple2;
 import scala.Tuple3;

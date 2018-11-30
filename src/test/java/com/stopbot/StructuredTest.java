@@ -16,7 +16,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.stopbot.common.UsefulFuncs;
-import com.stopbot.rdd.common.Click;
+import com.stopbot.dstream.common.Click;
 import com.stopbot.streaming.common.AnalyseFraud;
 
 public class StructuredTest {
