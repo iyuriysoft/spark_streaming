@@ -26,7 +26,7 @@ public class StreamingTest {
     @BeforeClass
     public static void setUpClass() throws Exception {
         spark = SparkSession.builder()
-                .appName("SparkStructuredStreamingDemo")
+                .appName("SparkStructuredStreamingTest")
                 .master("local[2]")
                 .getOrCreate();
         UsefulFuncs.setupUDFs(spark);
@@ -74,7 +74,7 @@ public class StreamingTest {
         Dataset<Row> stream = spark
                 .readStream()
                 .schema(AnalyseFraud.getInputSchema())
-                .json("test")
+                .json("test_data")
                 .withColumn("tstamp",
                         functions.to_timestamp(
                                 functions.from_unixtime(functions.col("unix_time"))));
