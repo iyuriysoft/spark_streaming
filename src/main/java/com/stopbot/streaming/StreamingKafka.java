@@ -19,28 +19,21 @@ import org.apache.spark.sql.streaming.OutputMode;
 import org.apache.spark.sql.streaming.StreamingQuery;
 import org.apache.spark.sql.streaming.StreamingQueryException;
 import org.apache.spark.sql.streaming.Trigger;
-import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructType;
 
 import com.stopbot.common.TargetWriter;
-import com.stopbot.common.UDFRatio;
-import com.stopbot.common.UDFUniqCount;
+import com.stopbot.common.UsefulFuncs;
+import com.stopbot.streaming.common.AnalyseFraud;
 
 public final class StreamingKafka {
 
     private static int WAITING_IN_SEC = 60;
-    private static int WIN_WATERMARK_IN_MIN = 5;
-    private static int WIN_DURATION_IN_MIN = 2;
-    private static int WIN_SLIDE_DURATION_IN_MIN = 1;
+    private static int WIN_WATERMARK_IN_SEC = 300;
+    private static int WIN_DURATION_IN_SEC = 120;
+    private static int WIN_SLIDE_DURATION_IN_SEC = 60;
     private static int THRESHOLD_COUNT_IP = 59;
     private static int THRESHOLD_COUNT_UNIQ_CATEGORY = 15;
     private static double THRESHOLD_CLICK_VIEW_RATIO = 3.5;
-
-    private static void setupUDFs(SparkSession spark) {
-        UDFRatio.init("click", "view");
-        spark.udf().registerJava("getDevided", UDFRatio.class.getName(), DataTypes.DoubleType);
-        spark.udf().registerJava("getUniqCount", UDFUniqCount.class.getName(), DataTypes.IntegerType);
-    }
 
     public static void main(String[] args) throws Exception {
 
@@ -57,19 +50,10 @@ public final class StreamingKafka {
                 .appName("StructuredStreaming")
                 .getOrCreate();
 
-        setupUDFs(spark);
+        UsefulFuncs.setupUDFs(spark);
 
-        // Define the input data schema
-        StructType schema = new StructType()
-                .add("ip", "string")
-                .add("unix_time", "long")
-                .add("type", "string")
-                .add("category_id", "int");
-
-        StreamingKafka job = new StreamingKafka();
-        job.startJobKafka(spark, schema);
+        new StreamingKafka().startJobKafka(spark, AnalyseFraud.getInputSchema());
     }
-
 
     private void startJobKafka(SparkSession spark, StructType schema) throws StreamingQueryException {
 
@@ -98,20 +82,18 @@ public final class StreamingKafka {
                                                                                       // timestamp
                 .withColumn("category_id", functions.col("tokens").getItem("category_id").cast("int"))
                 .withColumn("ip", functions.col("tokens").getItem("ip"))
-                .withColumn("type", functions.col("tokens").getItem("type"))
-                ;
+                .withColumn("type", functions.col("tokens").getItem("type"));
         stream.printSchema();
 
         Dataset<Row> wdf = AnalyseFraud.getFilterData(stream,
                 THRESHOLD_COUNT_IP,
                 THRESHOLD_COUNT_UNIQ_CATEGORY,
                 THRESHOLD_CLICK_VIEW_RATIO,
-                WIN_WATERMARK_IN_MIN,
-                WIN_DURATION_IN_MIN,
-                WIN_SLIDE_DURATION_IN_MIN
-                );
+                WIN_WATERMARK_IN_SEC,
+                WIN_DURATION_IN_SEC,
+                WIN_SLIDE_DURATION_IN_SEC);
         wdf.printSchema();
-        
+
         // Row -> String
         Dataset<String> wdf2 = wdf.map(row -> String.format("%s, %s, %d, %d, %f",
                 row.getAs("unix_time"), row.getAs("ip"), row.getAs("cnt"),
@@ -124,12 +106,13 @@ public final class StreamingKafka {
                 .outputMode(OutputMode.Complete())
                 .format("console")
                 .option("truncate", false)
-                .option("numRows", 10)
+                //.option("numRows", 10)
                 .trigger(Trigger.ProcessingTime(WAITING_IN_SEC, TimeUnit.SECONDS))
-                .foreach(new TargetWriter())
+                .foreach(TargetWriter.getInstance())
                 .start();
 
         query.awaitTermination();
+        TargetWriter.stop();
     }
 
 }

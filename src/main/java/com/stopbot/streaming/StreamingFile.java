@@ -13,30 +13,23 @@ import org.apache.spark.sql.streaming.OutputMode;
 import org.apache.spark.sql.streaming.StreamingQuery;
 import org.apache.spark.sql.streaming.StreamingQueryException;
 import org.apache.spark.sql.streaming.Trigger;
-import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructType;
 
 import com.stopbot.common.TargetWriter;
-import com.stopbot.common.UDFRatio;
-import com.stopbot.common.UDFUniqCount;
+import com.stopbot.common.UsefulFuncs;
+import com.stopbot.streaming.common.AnalyseFraud;
 
 public final class StreamingFile {
 
     private static String INPUT_DIR = "/Users/Shared/test/fraud";
     private static int WAITING_IN_SEC = 60;
-    private static int WIN_WATERMARK_IN_MIN = 5;
-    private static int WIN_DURATION_IN_MIN = 2;
-    private static int WIN_SLIDE_DURATION_IN_MIN = 1;
+    private static int WIN_WATERMARK_IN_SEC = 300;
+    private static int WIN_DURATION_IN_SEC = 120;
+    private static int WIN_SLIDE_DURATION_IN_SEC = 60;
     private static int THRESHOLD_COUNT_IP = 59;
     private static int THRESHOLD_COUNT_UNIQ_CATEGORY = 15;
     private static double THRESHOLD_CLICK_VIEW_RATIO = 3.5;
-
-    private static void setupUDFs(SparkSession spark) {
-        UDFRatio.init("click", "view");
-        spark.udf().registerJava("getDevided", UDFRatio.class.getName(), DataTypes.DoubleType);
-        spark.udf().registerJava("getUniqCount", UDFUniqCount.class.getName(), DataTypes.IntegerType);
-    }
-
+    
     public static void main(String[] args) throws Exception {
 
         Logger.getLogger("org").setLevel(Level.WARN);
@@ -52,17 +45,9 @@ public final class StreamingFile {
                 .appName("StructuredStreaming")
                 .getOrCreate();
 
-        setupUDFs(spark);
+        UsefulFuncs.setupUDFs(spark);
 
-        // Define the input data schema
-        StructType schema = new StructType()
-                .add("ip", "string")
-                .add("unix_time", "long")
-                .add("type", "string")
-                .add("category_id", "int");
-
-        StreamingFile job = new StreamingFile();
-        job.startJobFile(spark, schema);
+        new StreamingFile().startJobFile(spark, AnalyseFraud.getInputSchema());
     }
 
     private void startJobFile(SparkSession spark, StructType schema) throws StreamingQueryException {
@@ -81,10 +66,9 @@ public final class StreamingFile {
                 THRESHOLD_COUNT_IP,
                 THRESHOLD_COUNT_UNIQ_CATEGORY,
                 THRESHOLD_CLICK_VIEW_RATIO,
-                WIN_WATERMARK_IN_MIN,
-                WIN_DURATION_IN_MIN,
-                WIN_SLIDE_DURATION_IN_MIN
-                );
+                WIN_WATERMARK_IN_SEC,
+                WIN_DURATION_IN_SEC,
+                WIN_SLIDE_DURATION_IN_SEC);
         wdf.printSchema();
 
         // Row -> String
@@ -99,12 +83,13 @@ public final class StreamingFile {
                 .outputMode(OutputMode.Complete())
                 .format("console")
                 .option("truncate", false)
-                .option("numRows", 10)
+                // .option("numRows", 10)
                 .trigger(Trigger.ProcessingTime(WAITING_IN_SEC, TimeUnit.SECONDS))
-                .foreach(new TargetWriter())
+                .foreach(TargetWriter.getInstance())
                 .start();
 
         query.awaitTermination();
+        TargetWriter.stop();
     }
 
 }

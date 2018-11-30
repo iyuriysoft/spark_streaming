@@ -1,4 +1,4 @@
-package com.stopbot.streaming;
+package com.stopbot.streaming.common;
 
 import static org.apache.spark.sql.functions.callUDF;
 import static org.apache.spark.sql.functions.col;
@@ -6,16 +6,9 @@ import static org.apache.spark.sql.functions.col;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.functions;
+import org.apache.spark.sql.types.StructType;
 
 public class AnalyseFraud {
-
-    // input schema
-    //
-    // |-- ip: string (nullable = true)
-    // |-- unix_time: long (nullable = true)
-    // |-- type: string (nullable = true)
-    // |-- category_id: integer (nullable = true)
-    // |-- tstamp: timestamp (nullable = true)
 
     /**
      * Apply some filter to the source data
@@ -35,11 +28,11 @@ public class AnalyseFraud {
 
         // Apply event-time window
         Dataset<Row> wdf = df
-                .withWatermark("tstamp", String.format("%d minutes", delayThreshold))
+                .withWatermark("tstamp", String.format("%d seconds", delayThreshold))
                 .groupBy(
                         functions.window(functions.col("tstamp"),
-                                String.format("%d minutes", windowDuration),
-                                String.format("%d minutes", slideDuration)),
+                                String.format("%d seconds", windowDuration),
+                                String.format("%d seconds", slideDuration)),
                         functions.col("ip"))
                 .agg(functions.count("*").alias("cnt"),
                         functions.collect_list("type").alias("types"),
@@ -62,6 +55,14 @@ public class AnalyseFraud {
                 .withColumn("unix_time", functions.unix_timestamp(functions.col("end")));
 
         return wdf3;
+    }
+
+    public static StructType getInputSchema() {
+        return new StructType()
+                .add("ip", "string")
+                .add("unix_time", "long")
+                .add("type", "string")
+                .add("category_id", "int");
     }
 
 }

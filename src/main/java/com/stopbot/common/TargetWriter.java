@@ -1,30 +1,66 @@
 package com.stopbot.common;
 
+import org.apache.ignite.Ignite;
+import org.apache.ignite.Ignition;
+import org.apache.ignite.cache.CacheAtomicityMode;
+import org.apache.ignite.configuration.CacheConfiguration;
 import org.apache.spark.sql.ForeachWriter;
 
 public class TargetWriter extends ForeachWriter<String> {
 
     private static final long serialVersionUID = 1872205148155397396L;
 
-    public TargetWriter() {
+    private static TargetWriter instance;
+    private final static String CACHE_NAME = "myCache";
+    private final static String FILE_CONFIG = "config/ignite-example-cache.xml";
+    private CacheConfiguration<String, Long> ccfg;
+    public static Ignite ignite;
+
+    private TargetWriter() {
+        ignite = Ignition.start(FILE_CONFIG);
+        ccfg = new CacheConfiguration<String, Long>(CACHE_NAME)
+                .setSqlSchema("PUBLIC").setAtomicityMode(CacheAtomicityMode.TRANSACTIONAL);
+        System.out.println(String.format("constructor Thread:%s",
+                Thread.currentThread().getName()));
+    }
+
+    public static void stop() {
+        System.out.println(String.format("stop Thread:%s",
+                Thread.currentThread().getName()));
+        TargetWriter.ignite.close();
+        Ignition.stop(true);
+    }
+
+    public static synchronized TargetWriter getInstance() {
+        if (instance == null) {
+            synchronized (TargetWriter.class) {
+                if (instance == null) {
+                    instance = new TargetWriter();
+                }
+            }
+        }
+        return instance;
     }
 
     @Override
     public boolean open(long partitionId, long version) {
         // open connection
-        System.out.println(String.format("PARTITION:%d, VERSION:%d", partitionId, version));
+        System.out.println(String.format("PARTITION:%d, VERSION:%d, Thread:%s", partitionId, version,
+                Thread.currentThread().getName()));
         return true;
     }
 
     @Override
     public void process(String value) {
         // write string to connection
-        System.out.println(String.format("PROCESS:%s", value));
+        System.out.println(String.format("PROCESS:%s, Thread:%s", value, Thread.currentThread().getName()));
+        String[] ar = value.split(",");
+        ignite.getOrCreateCache(ccfg).put(ar[1], Long.valueOf(ar[0]));
     }
 
     @Override
     public void close(Throwable errorOrNull) {
         // close the connection
-        System.out.println(String.format("CLOSE"));
-    }
+        System.out.println(String.format("CLOSE, Thread:%s", Thread.currentThread().getName()));
+    }    
 }
