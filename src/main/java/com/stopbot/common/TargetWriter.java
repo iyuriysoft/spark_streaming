@@ -20,7 +20,7 @@ public class TargetWriter extends ForeachWriter<String> {
         ignite = Ignition.start(FILE_CONFIG);
         ccfg = new CacheConfiguration<String, Long>(CACHE_NAME)
                 .setSqlSchema("PUBLIC").setAtomicityMode(CacheAtomicityMode.TRANSACTIONAL);
-        System.out.println(String.format("constructor Thread:%s",
+        System.out.println(String.format("init TargetWriter:%s",
                 Thread.currentThread().getName()));
     }
 
