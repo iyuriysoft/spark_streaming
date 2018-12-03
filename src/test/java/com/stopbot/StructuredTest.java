@@ -50,14 +50,8 @@ public class StructuredTest {
         Assert.assertEquals(6, result.size());
         Row r;
         r = RowFactory.create(
-                "2018-11-30 15:16:00.0", "172.20.0.1", 19, 60, 2.75, 1543580160);
+                "2018-11-30 15:16:00.0","2018-11-30 15:14:00.0","172.20.0.1",19,60,2.75,1543580160,1543580040);
         Assert.assertEquals(r.toString(), result.get(0).toString());
-        r = RowFactory.create(
-                "2018-11-30 15:15:00.0", "172.20.0.0", 19, 60, 3.6153846153846154, 1543580100);
-        Assert.assertEquals(r.toString(), result.get(2).toString());
-        r = RowFactory.create(
-                "2018-11-30 15:14:00.0", "172.20.0.0", 20, 60, 3.6153846153846154, 1543580040);
-        Assert.assertEquals(r.toString(), result.get(5).toString());
     }
 
     private static List<Row> processData(Dataset<Row> stream) {
