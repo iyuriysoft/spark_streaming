@@ -20,7 +20,7 @@ public class AnalyseFraud {
      * @param delayThreshold      watermark in sec
      * @param windowDuration      window duration in sec
      * @param slideDuration       slide duration in sec
-     * @return Dataset<Row> ip, unix_time
+     * @return Dataset<Row> ip, unix_time_start, unix_time_end
      */
     public static Dataset<Row> getFilterData(Dataset<Row> df,
             int threshold, int thresholdCategories, double thresholdRatio,
@@ -46,13 +46,14 @@ public class AnalyseFraud {
                 .withColumnRenamed("UDF(categories)", "uniqCnt")
                 .withColumnRenamed("UDF(types)", "ratio");
 
-        // Apply restriction filter
+        // Apply restrictive filter
         Dataset<Row> wdf3 = wdf2.select(
-                col("window.end"), col("ip"), col("uniqCnt"), col("cnt"), col("ratio"))
+                col("window.end"), col("window.start"), col("ip"), col("uniqCnt"), col("cnt"), col("ratio"))
                 .where(col("cnt").$greater(threshold))
                 .where(col("uniqCnt").$greater(thresholdCategories))
                 .where(col("ratio").$greater(thresholdRatio))
-                .withColumn("unix_time", functions.unix_timestamp(functions.col("end")));
+                .withColumn("utime_end", functions.unix_timestamp(functions.col("end")))
+                .withColumn("utime_start", functions.unix_timestamp(functions.col("start")));
 
         return wdf3;
     }

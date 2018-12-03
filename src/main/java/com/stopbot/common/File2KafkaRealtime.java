@@ -17,35 +17,28 @@ import org.apache.kafka.clients.producer.RecordMetadata;
  * 
  * Reads lines from test-file and sends to Kafka like streaming
  *
- * file sample:
- * {"ip": "172.10.0.172", "unix_time": 1543170426, "type": "view", "category_id": 1008},
- * {"ip": "172.10.3.23", "unix_time": 1543170426, "type": "view", "category_id": 1002},
- * {"ip": "172.10.3.135", "unix_time": 1543170426, "type": "click", "category_id": 1007},
- * {"ip": "172.10.3.138", "unix_time": 1543170426, "type": "view", "category_id": 1001},
- * {"ip": "172.10.0.190", "unix_time": 1543170426, "type": "view", "category_id": 1001},
- * ...
+ * line format sample: {"ip": "172.10.0.172", "unix_time": 1543170426, "type":
+ * "view", "category_id": 1008}
  */
-public class File2Kafka {
+public class File2KafkaRealtime {
 
     public static void main(String[] args)
             throws FileNotFoundException, IOException, ParseException, InterruptedException, ExecutionException {
-        
-        int ilinesInSec = 100;
-        int ioffset = 0;
+
+        int speed = 1;
         String filename = "/Users/Shared/test/input.csv";
         String broker = "localhost:9092";
         String topic = "firsttopic";
-        
+
         System.out.println("Usage:\r\n"
-                + "(1) offset  (2) lines/s  (3) filename  (4) broker  (5) topic\r\n"
-                + "example: app.jar 0 100 data.csv localhost:9092 firsttopic\r\n");
-        
-        if (args.length == 5) {
-            ioffset = Integer.valueOf(args[0]);
-            ilinesInSec = Integer.valueOf(args[1]);
-            filename = args[2];
-            broker = args[3];
-            topic = args[4];
+                + "(1) speed coeff, 0 for sending at once  (2) filename  (3) broker:port  (4) topic\r\n"
+                + "example: app.jar data.csv 1 localhost:9092 firsttopic\r\n");
+        if (args.length == 4) {
+            int j = -1;
+            speed = Integer.valueOf(args[++j]);
+            filename = args[++j];
+            broker = args[++j];
+            topic = args[++j];
         }
 
         Properties props = new Properties();
@@ -61,17 +54,14 @@ public class File2Kafka {
 
         try (BufferedReader br = new BufferedReader(new FileReader(filename));) {
             String line1 = br.readLine();
-            int i = ioffset;
-            long time0 = System.currentTimeMillis();
+            long unix_time = UsefulFuncs.convertJsonToObject(line1).getUnix_time();
             while (line1 != null) {
-                if (i % ilinesInSec == 0 && i != 0) {
-                    long time_len = System.currentTimeMillis() - time0;
-                    if (time_len < 1000) {
-                        Thread.sleep(1000 - time_len);
-                    }
-                    time0 = System.currentTimeMillis();
+                long unix_time_new = UsefulFuncs.convertJsonToObject(line1).getUnix_time();
+                long d = unix_time_new - unix_time;
+                if (d > 0 && speed > 0) {
+                    unix_time = unix_time_new;
+                    Thread.sleep(d * 1000 / speed);
                 }
-
                 final ProducerRecord<Long, String> record = new ProducerRecord<>(topic, line1);
                 RecordMetadata metadata = producer.send(record).get();
                 long elapsedTime = System.currentTimeMillis() - time;
@@ -79,7 +69,6 @@ public class File2Kafka {
                         "meta(partition=%d, offset=%d) time=%d\n",
                         record.key(), record.value(), metadata.partition(),
                         metadata.offset(), elapsedTime);
-                i++;
                 line1 = br.readLine();
             }
         } finally {

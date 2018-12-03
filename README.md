@@ -1,9 +1,9 @@
 # spark_streaming
-spark structured streaming example
+Spark Structured Streaming and DStream examples
 
-### There two options to get source streaming data:
+### There are two options to get source streaming data:
 1. get from json-file (StreamingFile.java)
-2. get from Kafka (StreamingFile.java)
+2. get from Kafka (StreamingKafka.java)
 
 Source data format like that:
 
@@ -13,13 +13,13 @@ Source data format like that:
 
 ...
 
-Signs of bot activity in out case:
+Signs of bot's activity in our case:
 1. Enormous event rate, e.g. more than 59 request in 2 minutes.
 2. High difference between click and view events, e.g. (clicks/views) more than 3.5. Correctly process cases when there is no views.
 3. Looking for many categories during the period, e.g. more than 15 categories in 2 minutes.
 
 Starts real-time emulation (transfer data from json-file to Kafka (to use in StreamingKafka.java):
 ```
-> java -jar stopbot-0.0.1-SNAPSHOT-jar-with-dependencies.jar 0 100 1_bot.json localhost:9092 firsttopic
+> java -jar stopbot-0.0.1-SNAPSHOT-jar-with-dependencies.jar 1 300s2.json localhost:9092 firsttopic
 ```
 

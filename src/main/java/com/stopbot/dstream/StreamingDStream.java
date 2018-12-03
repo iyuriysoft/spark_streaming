@@ -34,26 +34,35 @@ import scala.Tuple3;
 import scala.Tuple4;
 
 public class StreamingDStream {
-    
+
     private static int WAITING_IN_SEC = 60;
     private static int WIN_DURATION_IN_SEC = 120;
     private static int WIN_SLIDE_DURATION_IN_SEC = 60;
     private static int THRESHOLD_COUNT_IP = 59;
     private static int THRESHOLD_COUNT_UNIQ_CATEGORY = 15;
-    private static double THRESHOLD_CLICK_VIEW_RATIO = 3.5;
+    private static double THRESHOLD_CLICK_VIEW_RATIO = 2.5;
 
-    public JavaPairDStream<Long, Tuple3<Click, Double, Integer>> startJob(JavaDStream<Click> stream) {
-        
+    /**
+     * 
+     * @param stream JavaDStream<Click>
+     * @return JavaDStream<String>
+     */
+    public JavaDStream<String> startJob(JavaDStream<Click> stream) {
+
+        stream.count().print();
         JavaPairDStream<String, Tuple4<Click, Long, List<String>, List<Integer>>> rddPair = stream
-                .mapToPair(f -> new Tuple2<>(f.getIP(), new Tuple4<>(f, 1L, new ArrayList<>(), new ArrayList<>())));
+                .mapToPair(f -> new Tuple2<>(
+                        f.getIP(),
+                        new Tuple4<>(f, 1L, new ArrayList<>(), new ArrayList<>())));
 
+        // Aggregate data by ip
         JavaPairDStream<String, Tuple4<Click, Long, List<String>, List<Integer>>> rdd2 = rddPair
                 .reduceByKeyAndWindow(
                         (i1, i2) -> {
                             i1._3().add(i2._1().getType());
                             i1._4().add(i2._1().getCategory_id());
                             return new Tuple4<>(
-                                    i1._1(),
+                                    i2._1(),
                                     i1._2() + i2._2(),
                                     i1._3(),
                                     i1._4());
@@ -68,6 +77,11 @@ public class StreamingDStream {
                         }, Durations.seconds(WIN_DURATION_IN_SEC),
                         Durations.seconds(WIN_SLIDE_DURATION_IN_SEC));
 
+        // Apply UDFs and restrictive filter
+        //
+        // as a result - JavaPairDStream<(ip count), Tuple3<(Click), (click/view ratio),
+        // (category count)>>
+        //
         JavaPairDStream<Long, Tuple3<Click, Double, Integer>> rdd3 = rdd2
                 .mapToPair(f -> new Tuple2<>(
                         f._2._2(),
@@ -79,7 +93,14 @@ public class StreamingDStream {
                         f._2._3() > THRESHOLD_COUNT_UNIQ_CATEGORY)
                 .transformToPair(f -> f.sortByKey(false));
         rdd3.print();
-        return rdd3;
+
+        // RDD Row -> RDD String
+        JavaDStream<String> rddString = rdd3.map(row -> String.format("%d, %s, %d, %d, %f",
+                row._2._1().getUnix_time(), row._2._1().getIP(),
+                row._1, row._2._3(), row._2._2()));
+        rddString.print();
+
+        return rddString;
     }
 
     /**
@@ -94,12 +115,13 @@ public class StreamingDStream {
         String topics = "firsttopic";
         {
             System.out.println("Usage:\r\n"
-                    + "(1) broker  (2) topic  (3) checkpoint path\r\n"
+                    + "(1) broker:port  (2) topic  (3) checkpoint path\r\n"
                     + "example: app.jar localhost:9092 firsttopic /Users/Shared/test/a\r\n");
             if (args.length == 3) {
-                brokers = args[0];
-                topics = args[1];
-                checkpoint_path = args[2];
+                int j = -1;
+                brokers = args[++j];
+                topics = args[++j];
+                checkpoint_path = args[++j];
             }
             System.out.println();
             System.out.println(String.format("broker: %s", brokers));

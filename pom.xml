@@ -30,7 +30,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>com.stopbot.common.File2Kafka</mainClass>
+							<mainClass>com.stopbot.common.File2KafkaRealtime</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
@@ -48,7 +48,7 @@
 					</descriptorRefs>
 					<archive>
 						<manifest>
-							<mainClass>com.stopbot.common.File2Kafka</mainClass>
+							<mainClass>com.stopbot.common.File2KafkaRealtime</mainClass>
 						</manifest>
 					</archive>
 
@@ -93,16 +93,19 @@
 			<groupId>org.apache.ignite</groupId>
 			<artifactId>ignite-core</artifactId>
 			<version>${ignite.version}</version>
+            <scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.ignite</groupId>
 			<artifactId>ignite-spring</artifactId>
 			<version>${ignite.version}</version>
+            <scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.ignite</groupId>
 			<artifactId>ignite-indexing</artifactId>
 			<version>${ignite.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<!-- <dependency> <groupId>mysql</groupId> <artifactId>mysql-connector-java</artifactId> 
 			<version>5.1.6</version> </dependency> -->

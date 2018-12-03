@@ -33,7 +33,7 @@ public final class StreamingKafka {
     private static int WIN_SLIDE_DURATION_IN_SEC = 60;
     private static int THRESHOLD_COUNT_IP = 59;
     private static int THRESHOLD_COUNT_UNIQ_CATEGORY = 15;
-    private static double THRESHOLD_CLICK_VIEW_RATIO = 3.5;
+    private static double THRESHOLD_CLICK_VIEW_RATIO = 2.5;
 
     public static void main(String[] args) throws Exception {
 
@@ -95,14 +95,14 @@ public final class StreamingKafka {
         wdf.printSchema();
 
         // Row -> String
-        Dataset<String> wdf2 = wdf.map(row -> String.format("%s, %s, %d, %d, %f",
-                row.getAs("unix_time"), row.getAs("ip"), row.getAs("cnt"),
+        Dataset<String> wdf2 = wdf.map(row -> String.format("%s, %s, %s, %d, %d, %f",
+                row.getAs("utime_start"), row.getAs("utime_end"), row.getAs("ip"), row.getAs("cnt"),
                 row.getAs("uniqCnt"), row.getAs("ratio")),
                 Encoders.STRING());
 
         // Write the the output of the query to the console
         StreamingQuery query = wdf2.writeStream()
-                .queryName("1 stream")
+                .queryName("stream1")
                 .outputMode(OutputMode.Complete())
                 .format("console")
                 .option("truncate", false)

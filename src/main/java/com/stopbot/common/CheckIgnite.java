@@ -20,8 +20,6 @@ public class CheckIgnite {
         ignite = Ignition.start(FILE_CONFIG);
         ccfg = new CacheConfiguration<String, Long>(CACHE_NAME)
                 .setSqlSchema("PUBLIC").setAtomicityMode(CacheAtomicityMode.TRANSACTIONAL);
-        System.out.println(String.format("init Thread:%s",
-                Thread.currentThread().getName()));
     }
 
     private void f() {

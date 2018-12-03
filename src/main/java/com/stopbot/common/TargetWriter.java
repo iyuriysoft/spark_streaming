@@ -13,20 +13,20 @@ public class TargetWriter extends ForeachWriter<String> {
     private static TargetWriter instance;
     private final static String CACHE_NAME = "myCache";
     private final static String FILE_CONFIG = "config/ignite-example-cache.xml";
-    private CacheConfiguration<String, Long> ccfg;
+    private CacheConfiguration<Long, String> ccfg;
     public static Ignite ignite;
 
     private TargetWriter() {
         ignite = Ignition.start(FILE_CONFIG);
-        ccfg = new CacheConfiguration<String, Long>(CACHE_NAME)
+        ccfg = new CacheConfiguration<Long, String>(CACHE_NAME)
                 .setSqlSchema("PUBLIC").setAtomicityMode(CacheAtomicityMode.TRANSACTIONAL);
-        System.out.println(String.format("init TargetWriter:%s",
-                Thread.currentThread().getName()));
+        System.out.println(String.format("init TargetWriter:%d",
+                Thread.currentThread().getId()));
     }
 
     public static void stop() {
-        System.out.println(String.format("stop Thread:%s",
-                Thread.currentThread().getName()));
+        System.out.println(String.format("stop Thread:%d",
+                Thread.currentThread().getId()));
         TargetWriter.ignite.close();
         Ignition.stop(true);
     }
@@ -45,22 +45,22 @@ public class TargetWriter extends ForeachWriter<String> {
     @Override
     public boolean open(long partitionId, long version) {
         // open connection
-        System.out.println(String.format("PARTITION:%d, VERSION:%d, Thread:%s", partitionId, version,
-                Thread.currentThread().getName()));
+        System.out.println(String.format("PARTITION:%d, VERSION:%d, Thread:%d", partitionId, version,
+                Thread.currentThread().getId()));
         return true;
     }
 
     @Override
     public void process(String value) {
         // write string to connection
-        System.out.println(String.format("PROCESS:%s, Thread:%s", value, Thread.currentThread().getName()));
+        System.out.println(String.format("PROCESS:%s, Thread:%d", value, Thread.currentThread().getId()));
         String[] ar = value.split(",");
-        ignite.getOrCreateCache(ccfg).put(ar[1], Long.valueOf(ar[0]));
+        ignite.getOrCreateCache(ccfg).put(Long.valueOf(ar[1].trim()), ar[2]);
     }
 
     @Override
     public void close(Throwable errorOrNull) {
         // close the connection
-        System.out.println(String.format("CLOSE, Thread:%s", Thread.currentThread().getName()));
+        System.out.println(String.format("CLOSE, Thread:%d", Thread.currentThread().getId()));
     }    
 }

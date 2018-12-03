@@ -40,7 +40,7 @@ public class Click implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("%d, %s, click:%s, cat:%d",
+        return String.format("%d, %s, ratio:%s, categ_cnt:%d",
                 this.getUnix_time(), this.getIP(), this.getType(), this.getCategory_id());
     }
 
