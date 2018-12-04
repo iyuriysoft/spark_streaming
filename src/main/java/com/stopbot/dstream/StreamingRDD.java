@@ -55,7 +55,7 @@ public class StreamingRDD {
         
         UsefulFuncs.setupUDFs(JavaSingletonSpark.getInstance(r.context().getConf()));
 
-        // init structure
+        // init
         // PairRDD<(ip),<(last Click), (ip count), (list of types), (list of cats),
         // (utime start), (utime end)>>
         //
@@ -90,7 +90,7 @@ public class StreamingRDD {
                         f._2._3() > THRESHOLD_COUNT_UNIQ_CATEGORY)
                 .sortByKey(false);
 
-        // to string and put to external
+        // convert to string and put to external
         rddOut.collect().stream().forEach(a -> {
             String value = String.format("%d,%d,%s,%d,%d,%f",
                     a._2._4(), a._2._5(), a._2._1().getIP(), a._1, a._2._3(), a._2._2());
@@ -99,6 +99,7 @@ public class StreamingRDD {
     }
 
     /**
+     * Start job to find bots
      * 
      * @param topics
      * @param brokers

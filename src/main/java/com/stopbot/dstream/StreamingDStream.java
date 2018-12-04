@@ -43,11 +43,12 @@ public class StreamingDStream {
     private static double THRESHOLD_CLICK_VIEW_RATIO = 2.5;
 
     /**
+     * Find bots
      * 
-     * @param rdd
+     * @param rdd JavaDStream<Click>
      * @return JavaDStream<String>
      */
-    public JavaDStream<String> findBots(JavaDStream<Click> rdd) {
+    private JavaDStream<String> findBots(JavaDStream<Click> rdd) {
         
         JavaPairDStream<String, Tuple6<Click, Long, List<String>, List<Integer>, Long, Long>> rddPair = rdd
                 .mapToPair(f -> new Tuple2<>(
@@ -73,7 +74,6 @@ public class StreamingDStream {
                         //    // Removing elements from the oldest slice
                         }, Durations.seconds(WIN_DURATION_IN_SEC));
 
-        //
         // Apply UDFs and restrictive filter
         //
         // as a result - JavaPairDStream<(ip count), Tuple5<(Click), (click/view ratio),
@@ -105,13 +105,14 @@ public class StreamingDStream {
     }
     
     /**
+     * Start job to find bots
      * 
      * @param topics
      * @param brokers
      * @param checkpoint_path
      * @throws InterruptedException 
      */
-    public void startJob(String topics, String brokers, String checkpoint_path) throws InterruptedException {
+    private void startJob(String topics, String brokers, String checkpoint_path) throws InterruptedException {
 
         SparkConf sparkConf = new SparkConf()
                 .set("spark.streaming.kafka.consumer.cache.enabled", "false")
