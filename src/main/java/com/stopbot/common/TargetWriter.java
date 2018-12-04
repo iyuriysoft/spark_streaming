@@ -13,12 +13,12 @@ public class TargetWriter extends ForeachWriter<String> {
     private static TargetWriter instance;
     private final static String CACHE_NAME = "myCache";
     private final static String FILE_CONFIG = "config/ignite-example-cache.xml";
-    private CacheConfiguration<Long, String> ccfg;
+    private CacheConfiguration<String, Long> ccfg;
     public static Ignite ignite;
 
     private TargetWriter() {
         ignite = Ignition.start(FILE_CONFIG);
-        ccfg = new CacheConfiguration<Long, String>(CACHE_NAME)
+        ccfg = new CacheConfiguration<String, Long>(CACHE_NAME)
                 .setSqlSchema("PUBLIC").setAtomicityMode(CacheAtomicityMode.TRANSACTIONAL);
         System.out.println(String.format("init TargetWriter:%d",
                 Thread.currentThread().getId()));
@@ -55,7 +55,7 @@ public class TargetWriter extends ForeachWriter<String> {
         // write string to connection
         System.out.println(String.format("PROCESS:%s, Thread:%d", value, Thread.currentThread().getId()));
         String[] ar = value.split(",");
-        ignite.getOrCreateCache(ccfg).put(Long.valueOf(ar[1].trim()), ar[2]);
+        ignite.getOrCreateCache(ccfg).put(ar[2], Long.valueOf(ar[1].trim()));
     }
 
     @Override
