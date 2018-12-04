@@ -27,7 +27,8 @@ public class TargetWriter extends ForeachWriter<String> {
     public static void stop() {
         System.out.println(String.format("stop Thread:%d",
                 Thread.currentThread().getId()));
-        TargetWriter.ignite.close();
+        if (TargetWriter.ignite != null)
+            TargetWriter.ignite.close();
         Ignition.stop(true);
     }
 
@@ -50,6 +51,9 @@ public class TargetWriter extends ForeachWriter<String> {
         return true;
     }
 
+    /**
+     * value - start, end, ip, cnt, categ_cnt, ratio
+     */
     @Override
     public void process(String value) {
         // write string to connection
