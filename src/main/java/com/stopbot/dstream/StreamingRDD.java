@@ -47,7 +47,7 @@ public class StreamingRDD {
     /**
      * Find bots with abnormal behavior and put them to external storage
      * 
-     * @param r JavaRDD<Click>
+     * @param r JavaRDD<Click> window
      */
     private void findBots(JavaRDD<Click> r) {
         
@@ -138,7 +138,7 @@ public class StreamingRDD {
                 Durations.seconds(WIN_DURATION_IN_SEC),
                 Durations.seconds(WIN_SLIDE_DURATION_IN_SEC));
 
-        // Convert JavaDStream to set of JavaRDD
+        // Convert JavaDStream to set of JavaRDD and apply analysis
         wrdd.foreachRDD(r -> findBots(r));
 
         jssc.checkpoint(checkpoint_path);

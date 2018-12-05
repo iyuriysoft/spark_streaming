@@ -78,7 +78,7 @@ public final class StreamingFile {
                 row.getAs("uniqCnt"), row.getAs("ratio")),
                 Encoders.STRING());
 
-        // Write the the output of the query to the console
+        // Write the the output of the query to the console/external storage
         StreamingQuery query = wdf2.writeStream()
                 .queryName("stream1")
                 .outputMode(OutputMode.Complete())

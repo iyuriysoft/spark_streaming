@@ -14,9 +14,10 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 
 /**
+ * Simulate real-time data consumption.
  * 
- * Reads lines from test-file and sends to Kafka like streaming.
- * It is possible to change the data sending speed.
+ * Read lines from test-file and send to Kafka like streaming.
+ * It's possible to change the data sending speed.
  *
  * line format: {"ip": "172.10.0.172", "unix_time": 1543170426, "type":
  * "view", "category_id": 1008}

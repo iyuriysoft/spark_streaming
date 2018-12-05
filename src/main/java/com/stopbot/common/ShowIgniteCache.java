@@ -37,6 +37,7 @@ public class ShowIgniteCache {
 
     public static void main(String[] args) {
         new ShowIgniteCache().f();
+        Ignition.stop(false);
     }
 
 }

@@ -141,7 +141,7 @@ public class StreamingDStream {
         // Create typed DStream
         JavaDStream<Click> rdd = stream.map(x -> UsefulFuncs.convertJsonToObject(x.value()));
 
-        // Apply analyzing
+        // Apply analysis
         JavaDStream<String> rddStr = findBots(rdd);
         // Output operator
         rddStr.print();
@@ -184,7 +184,7 @@ public class StreamingDStream {
         Logger.getLogger("akka").setLevel(Level.WARN);
 
 
-        // Apply analyzing
+        // Find bots
         new StreamingDStream().startJob(topics, brokers, checkpoint_path);
     }
 
