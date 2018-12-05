@@ -3,7 +3,7 @@ package com.stopbot.dstream.common;
 import java.io.Serializable;
 
 /**
- * Class to process data like:
+ * The class reflects the information about request:
  * 
  * {"ip": "172.10.0.145", "unix_time": 1540473077, "type": "view", "category_id": 1000}
  *  
