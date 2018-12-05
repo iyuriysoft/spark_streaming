@@ -27,7 +27,7 @@ Signs of bot's activity in our case:
 3. Looking for many categories during the period, e.g. more than 15 categories in 2 minutes.
 
 To simulate receiving data there is File2KafkaRealtime class.
-Starts real-time simulation (transfer data from json-file to Kafka (to use in StreamingKafka):
+Start real-time simulation - transfer data from json-file to Kafka:
 ```
 > java -jar stopbot-0.0.1-SNAPSHOT-jar-with-dependencies.jar 1 300s2.json localhost:9092 firsttopic
 ```
