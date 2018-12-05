@@ -56,6 +56,7 @@ public final class StreamingKafka {
         String topics = "firsttopic";
 
         new StreamingKafka().startJobKafka(spark, AnalyseFraud.getInputSchema(), brokers, topics);
+        spark.stop();
     }
 
     private void startJobKafka(SparkSession spark, StructType schema, String brokers, String topics) throws StreamingQueryException {

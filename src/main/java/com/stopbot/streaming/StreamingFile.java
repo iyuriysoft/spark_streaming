@@ -48,6 +48,7 @@ public final class StreamingFile {
         UsefulFuncs.setupUDFs(spark);
 
         new StreamingFile().startJobFile(spark, AnalyseFraud.getInputSchema());
+        spark.stop();
     }
 
     private void startJobFile(SparkSession spark, StructType schema) throws StreamingQueryException {
