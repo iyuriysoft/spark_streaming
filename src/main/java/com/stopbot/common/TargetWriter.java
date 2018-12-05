@@ -6,6 +6,11 @@ import org.apache.ignite.cache.CacheAtomicityMode;
 import org.apache.ignite.configuration.CacheConfiguration;
 import org.apache.spark.sql.ForeachWriter;
 
+/**
+ * 
+ *  Save streaming results to external storage (Ignite cache)
+ *
+ */
 public class TargetWriter extends ForeachWriter<String> {
 
     private static final long serialVersionUID = 1872205148155397396L;

@@ -9,6 +9,11 @@ import org.apache.ignite.Ignition;
 import org.apache.ignite.cache.CacheAtomicityMode;
 import org.apache.ignite.configuration.CacheConfiguration;
 
+/**
+ * 
+ * Check processing results in Ignite cache
+ *
+ */
 public class CheckIgnite {
 
     private final static String CACHE_NAME = "myCache";
