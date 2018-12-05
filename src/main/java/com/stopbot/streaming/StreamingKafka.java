@@ -52,14 +52,15 @@ public final class StreamingKafka {
 
         UsefulFuncs.setupUDFs(spark);
 
-        new StreamingKafka().startJobKafka(spark, AnalyseFraud.getInputSchema());
+        String brokers = "localhost:9092";
+        String topics = "firsttopic";
+
+        new StreamingKafka().startJobKafka(spark, AnalyseFraud.getInputSchema(), brokers, topics);
     }
 
-    private void startJobKafka(SparkSession spark, StructType schema) throws StreamingQueryException {
+    private void startJobKafka(SparkSession spark, StructType schema, String brokers, String topics) throws StreamingQueryException {
 
-        String brokers = "localhost:9092";
         String groupId = "0";// UUID.randomUUID().toString();
-        String topics = "firsttopic";
 
         Map<String, Object> kafkaParams = new HashMap<>();
         kafkaParams.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, brokers);

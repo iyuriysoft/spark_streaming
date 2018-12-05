@@ -15,9 +15,10 @@ import org.apache.kafka.clients.producer.RecordMetadata;
 
 /**
  * 
- * Reads lines from test-file and sends to Kafka like streaming
+ * Reads lines from test-file and sends to Kafka like streaming.
+ * It is possible to change the data sending speed.
  *
- * line format sample: {"ip": "172.10.0.172", "unix_time": 1543170426, "type":
+ * line format: {"ip": "172.10.0.172", "unix_time": 1543170426, "type":
  * "view", "category_id": 1008}
  */
 public class File2KafkaRealtime {

@@ -55,7 +55,8 @@ public class StreamingRDD {
         
         UsefulFuncs.setupUDFs(JavaSingletonSpark.getInstance(r.context().getConf()));
 
-        // init
+        // transform data
+        //
         // PairRDD<(ip),<(last Click), (ip count), (list of types), (list of cats),
         // (utime start), (utime end)>>
         //

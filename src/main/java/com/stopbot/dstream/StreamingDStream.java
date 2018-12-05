@@ -143,6 +143,7 @@ public class StreamingDStream {
 
         // Apply analyzing
         JavaDStream<String> rddStr = findBots(rdd);
+        // Output operator
         rddStr.print();
         
         jssc.checkpoint(checkpoint_path);
