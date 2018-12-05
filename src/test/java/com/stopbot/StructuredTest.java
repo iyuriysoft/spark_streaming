@@ -5,12 +5,15 @@ import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.RowFactory;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.functions;
 import org.apache.spark.sql.streaming.OutputMode;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -25,11 +28,18 @@ public class StructuredTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
+        Logger.getLogger("org").setLevel(Level.WARN);
+        Logger.getLogger("akka").setLevel(Level.WARN);
         spark = SparkSession.builder()
                 .appName("SparkStructuredStreamingTest")
                 .master("local[2]")
                 .getOrCreate();
         UsefulFuncs.setupUDFs(spark);
+    }
+    
+    @AfterClass
+    public static void tearDownClass() {
+        spark.stop();
     }
 
     @Test
