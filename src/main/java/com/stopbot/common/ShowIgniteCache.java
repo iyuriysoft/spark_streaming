@@ -11,17 +11,17 @@ import org.apache.ignite.configuration.CacheConfiguration;
 
 /**
  * 
- * Check processing results in Ignite cache
+ * Show processing results located in Ignite cache
  *
  */
-public class CheckIgnite {
+public class ShowIgniteCache {
 
     private final static String CACHE_NAME = "myCache";
     private final static String FILE_CONFIG = "config/ignite-example-cache.xml";
     private CacheConfiguration<String, Long> ccfg;
     public static Ignite ignite;
 
-    public CheckIgnite() {
+    public ShowIgniteCache() {
         ignite = Ignition.start(FILE_CONFIG);
         ccfg = new CacheConfiguration<String, Long>(CACHE_NAME)
                 .setSqlSchema("PUBLIC").setAtomicityMode(CacheAtomicityMode.TRANSACTIONAL);
@@ -36,7 +36,7 @@ public class CheckIgnite {
     }
 
     public static void main(String[] args) {
-        new CheckIgnite().f();
+        new ShowIgniteCache().f();
     }
 
 }
