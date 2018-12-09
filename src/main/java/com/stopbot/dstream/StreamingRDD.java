@@ -1,7 +1,9 @@
 package com.stopbot.dstream;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -23,6 +25,8 @@ import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.kafka010.ConsumerStrategies;
 import org.apache.spark.streaming.kafka010.KafkaUtils;
 import org.apache.spark.streaming.kafka010.LocationStrategies;
+import org.apache.spark.streaming.Time;
+
 
 import com.stopbot.common.TargetWriter;
 import com.stopbot.common.UDFRatio;
@@ -49,9 +53,11 @@ public class StreamingRDD {
      * 
      * @param r JavaRDD<Click> window
      */
-    private void findBots(JavaRDD<Click> r) {
+    private void findBots(JavaRDD<Click> r, Time time) {
         
-        System.out.println(r.count());
+        String stime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date(time.milliseconds()));
+        System.out.println(String.format("----- %d; %s", r.count(), stime));
+
         
         UsefulFuncs.setupUDFs(JavaSingletonSpark.getInstance(r.context().getConf()));
 
@@ -110,7 +116,7 @@ public class StreamingRDD {
     private void startJob(String topics, String brokers, String checkpoint_path) throws InterruptedException {
 
         SparkConf sparkConf = new SparkConf()
-                .set("spark.streaming.kafka.consumer.cache.enabled", "false")
+                //.set("spark.streaming.kafka.consumer.cache.enabled", "false")
                 .setMaster("local[2]")
                 .setAppName("JavaKafka");
         JavaStreamingContext jssc = new JavaStreamingContext(sparkConf, Durations.seconds(WAITING_IN_SEC));
@@ -139,9 +145,9 @@ public class StreamingRDD {
                 Durations.seconds(WIN_SLIDE_DURATION_IN_SEC));
 
         // Convert JavaDStream to set of JavaRDD and apply analysis
-        wrdd.foreachRDD(r -> findBots(r));
+        wrdd.foreachRDD((r, time) -> findBots(r, time));
 
-        jssc.checkpoint(checkpoint_path);
+        //jssc.checkpoint(checkpoint_path);
         jssc.start();
         jssc.awaitTermination();
         jssc.close();
