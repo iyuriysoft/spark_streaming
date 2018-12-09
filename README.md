@@ -1,7 +1,7 @@
 # spark_streaming
 Spark Structured Streaming and DStream examples
 
-## Example of task
+## Sample task
 Need to detect bot traffic.
 The input data is a log with requests from users each of them contains fields like ip address, url or category page, timestamp, 'click' or 'view' type and so on so forth. 
 
