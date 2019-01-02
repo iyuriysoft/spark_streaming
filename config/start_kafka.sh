@@ -8,8 +8,8 @@ $KAFKA_HOME/bin/kafka-server-start.sh -daemon $KAFKA_HOME/config/server.properti
 
 sleep 2
 
-echo "create topic "$1
-$KAFKA_HOME/bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic $1
+echo "create topic: firsttopic"
+$KAFKA_HOME/bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic firsttopic
 
 sleep 2
 
