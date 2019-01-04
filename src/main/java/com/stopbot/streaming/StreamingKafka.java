@@ -2,12 +2,8 @@ package com.stopbot.streaming;
 
 import static org.apache.spark.sql.functions.col;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
@@ -61,13 +57,12 @@ public final class StreamingKafka {
 
     private void startJobKafka(SparkSession spark, StructType schema, String brokers, String topics) throws StreamingQueryException {
 
-        String groupId = "0";// UUID.randomUUID().toString();
-
-        Map<String, Object> kafkaParams = new HashMap<>();
-        kafkaParams.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, brokers);
-        kafkaParams.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
-        kafkaParams.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        kafkaParams.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        //String groupId = "0";// UUID.randomUUID().toString();
+        //Map<String, Object> kafkaParams = new HashMap<>();
+        //kafkaParams.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, brokers);
+        //kafkaParams.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
+        //kafkaParams.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        //kafkaParams.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 
         Dataset<Row> stream = spark
                 .readStream()
