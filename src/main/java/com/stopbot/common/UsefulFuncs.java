@@ -11,6 +11,17 @@ import com.stopbot.dstream.common.Click;
 
 public class UsefulFuncs {
 
+    public static int WAITING_TO_CLEAR_OLD = 90;
+
+    public static String INPUT_DIR = "/Users/Shared/test/fraud";
+    public static int WAITING_IN_SEC = 60;
+    public static int WIN_WATERMARK_IN_SEC = 300;
+    public static int WIN_DURATION_IN_SEC = 120;
+    public static int WIN_SLIDE_DURATION_IN_SEC = 60;
+    public static int THRESHOLD_COUNT_IP = 59;
+    public static int THRESHOLD_COUNT_UNIQ_CATEGORY = 15;
+    public static double THRESHOLD_CLICK_VIEW_RATIO = 2.5;
+
     public static void setupUDFs(SparkSession spark) {
         UDFRatio.init("click", "view");
         spark.udf().registerJava("getDevided", UDFRatio.class.getName(), DataTypes.DoubleType);

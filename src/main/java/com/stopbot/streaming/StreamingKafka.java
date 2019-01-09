@@ -23,14 +23,6 @@ import com.stopbot.streaming.common.AnalyseFraud;
 
 public final class StreamingKafka {
 
-    private static int WAITING_IN_SEC = 60;
-    private static int WIN_WATERMARK_IN_SEC = 300;
-    private static int WIN_DURATION_IN_SEC = 120;
-    private static int WIN_SLIDE_DURATION_IN_SEC = 60;
-    private static int THRESHOLD_COUNT_IP = 59;
-    private static int THRESHOLD_COUNT_UNIQ_CATEGORY = 15;
-    private static double THRESHOLD_CLICK_VIEW_RATIO = 2.5;
-
     public static void main(String[] args) throws Exception {
 
         Logger.getLogger("org").setLevel(Level.WARN);
@@ -83,12 +75,12 @@ public final class StreamingKafka {
         stream.printSchema();
 
         Dataset<Row> wdf = AnalyseFraud.getFilterData(stream,
-                THRESHOLD_COUNT_IP,
-                THRESHOLD_COUNT_UNIQ_CATEGORY,
-                THRESHOLD_CLICK_VIEW_RATIO,
-                WIN_WATERMARK_IN_SEC,
-                WIN_DURATION_IN_SEC,
-                WIN_SLIDE_DURATION_IN_SEC);
+        		UsefulFuncs.THRESHOLD_COUNT_IP,
+        		UsefulFuncs.THRESHOLD_COUNT_UNIQ_CATEGORY,
+        		UsefulFuncs.THRESHOLD_CLICK_VIEW_RATIO,
+        		UsefulFuncs.WIN_WATERMARK_IN_SEC,
+        		UsefulFuncs.WIN_DURATION_IN_SEC,
+        		UsefulFuncs.WIN_SLIDE_DURATION_IN_SEC);
         wdf.printSchema();
 
         // Row -> String
@@ -104,7 +96,7 @@ public final class StreamingKafka {
                 .format("console")
                 .option("truncate", false)
                 //.option("numRows", 10)
-                .trigger(Trigger.ProcessingTime(WAITING_IN_SEC, TimeUnit.SECONDS))
+                .trigger(Trigger.ProcessingTime(UsefulFuncs.WAITING_IN_SEC, TimeUnit.SECONDS))
                 .foreach(TargetWriter.getInstance())
                 .start();
 
