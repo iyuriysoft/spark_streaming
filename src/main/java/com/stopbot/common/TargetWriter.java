@@ -29,8 +29,8 @@ public class TargetWriter extends ForeachWriter<String> {
 	private TargetWriter() {
 		ignite = Ignition.start(FILE_CONFIG);
 		ccfg = new CacheConfiguration<String, Long>(CACHE_NAME)
-				//.setExpiryPolicyFactory(
-				//		CreatedExpiryPolicy.factoryOf(new Duration(SECONDS, UsefulFuncs.WAITING_TO_CLEAR_OLD)))
+				.setExpiryPolicyFactory(
+						CreatedExpiryPolicy.factoryOf(new Duration(SECONDS, UsefulFuncs.WAITING_TO_CLEAR_OLD)))
 				.setSqlSchema("PUBLIC").setAtomicityMode(CacheAtomicityMode.TRANSACTIONAL);
 		System.out.println(String.format("init TargetWriter:%d", Thread.currentThread().getId()));
 	}
@@ -70,7 +70,7 @@ public class TargetWriter extends ForeachWriter<String> {
 		System.out.println(String.format("PROCESS:%s, Thread:%d", value, Thread.currentThread().getId()));
 		String[] ar = value.split(",");
 		ignite.getOrCreateCache(ccfg)
-				.withExpiryPolicy(new CreatedExpiryPolicy(new Duration(SECONDS, UsefulFuncs.WAITING_TO_CLEAR_OLD)))
+				//.withExpiryPolicy(new CreatedExpiryPolicy(new Duration(SECONDS, UsefulFuncs.WAITING_TO_CLEAR_OLD)))
 				.put(ar[2], Long.valueOf(ar[1].trim()));
 	}
 
